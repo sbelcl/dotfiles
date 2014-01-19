@@ -1,0 +1,19 @@
+!~/.Xresources
+
+!urxvt settings
+
+URxvt*loginShell: true
+!URxvt*transparent: true
+!URxvt*shading: 30
+URxvt*scrollBar: off
+URxvt*font: -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-2
+!URxvt*font: xft:inconsolata:pixelsize=15
+URxvt*boldFont: -misc-fixed-bold-r-normal--15-140-75-75-c-90-iso8859-2
+URxvt*foreground: white 
+URxvt*cursorBlink: true
+!URxvt*tintColor: black
+URxvt*saveLines: 32767 
+URxvt.depth: 32
+URxvt.background: rgba:1111/1111/1111/dddf
+URxvt.fading: 30
+URxvt.fadeColor: black 
