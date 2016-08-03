@@ -1,0 +1,2 @@
+amixer set Master on && amixer set Headphone on && amixer set Master 1-
+amixer get Master | egrep -o "[0-9]+%" | dzen2 -p 5

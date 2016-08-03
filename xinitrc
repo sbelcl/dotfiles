@@ -1,27 +1,62 @@
 #!/bin/sh
-#
-# ~/.xinitrc
-#
-# Executed by startx (run your window manager from here)
 
-if [ -d /etc/X11/xinit/xinitrc.d ]; then
-  for f in /etc/X11/xinit/xinitrc.d/*; do
-    [ -x "$f" ] && . "$f"
-  done
-  unset f
+userresources=$HOME/.Xresources
+usermodmap=$HOME/.Xmodmap
+sysresources=/etc/X11/xinit/.Xresources
+sysmodmap=/etc/X11/xinit/.Xmodmap
+
+# merge in defaults and keymaps
+
+if [ -f $sysresources ]; then
+
+
+
+
+
+
+
+    xrdb -merge $sysresources
+
 fi
 
-devmon &
-xrdb -merge ~/.Xresources
-feh --bg-scale ~/archlinux001.jpg &
-setxkbmap -layout si &
-mpd ~/.mpdconf 
-xcompmgr -f &
-########################### TESTING #######################
+if [ -f $sysmodmap ]; then
+    xmodmap $sysmodmap
+fi
 
-# exec gnome-session
-# exec startkde
-# exec startxfce4
-# ...or the Window Manager of your choice
-# exec ck-launch-session xmonad
+if [ -f "$userresources" ]; then
+
+
+
+
+
+
+
+    xrdb -merge "$userresources"
+
+fi
+
+if [ -f "$usermodmap" ]; then
+    xmodmap "$usermodmap"
+fi
+
+# start some nice programs
+
+if [ -d /etc/X11/xinit/xinitrc.d ] ; then
+ for f in /etc/X11/xinit/xinitrc.d/?*.sh ; do
+  [ -x "$f" ] && . "$f"
+ done
+ unset f
+fi
+
+#twm &
+#xclock -geometry 50x50-1+1 &
+#xterm -geometry 80x50+494+51 &
+#xterm -geometry 80x20+494-0 &
+#exec xterm -geometry 80x66+0+0 -name login
+
+feh --bg-fill ~/.ozadja/arch.jpg &
+mpd ~/.mpdconf &
+setxkbmap -layout si &
+xcompmgr -f &
+
 exec xmonad

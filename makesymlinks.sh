@@ -8,7 +8,7 @@
 
 dir=~/dotfiles                    # dotfiles directory
 olddir=~/dotfiles_old             # old dotfiles backup directory
-files="vimrc zshrc Xresources xinitrc mpdconf dir_colors"    # list of files/folders to symlink in homedir
+files="vimrc zshrc zprofile Xresources xinitrc mpdconf dir_colors xmonad"    # list of files/folders to symlink in homedir
 
 ##########
 

@@ -1,0 +1,92 @@
+import XMonad hiding ( (|||) )
+import XMonad.Layout.LayoutCombinators
+import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.UrgencyHook
+import XMonad.Util.Run(spawnPipe)
+import System.IO
+import XMonad.Actions.DynamicWorkspaces
+import XMonad.Prompt
+import qualified XMonad.StackSet as W
+import qualified Data.Map	 as M
+import XMonad.Layout.PerWorkspace
+import XMonad.Util.EZConfig
+
+myManageHook = composeAll
+	[ className =? "MPlayer" --> doShift "media" <+> doFloat
+	, className =? "feh" --> doShift "pics" <+> doFloat
+	, className =? "Chromium" --> doShift "www"
+	, className =? "Wine" --> doShift "games" <+> doFloat
+	, className =? "Gimp" --> doShift "art" <+> doFloat
+	, className =? "URxvt" --> doShift "term"
+	, className =? "ncmpcpp" --> doShift "media"
+	, className =? "rdesktop" --> doShift "9" <+> doFloat
+	, className =? "Dwb" --> doShift "www"
+	, className =? "Xfburn" --> doFloat
+	, className =? "Računalo" --> doFloat
+	, className =? "Vlc" --> doFloat
+	, manageDocks
+	]
+
+myStatusBar = "dzen2 -ta l -x 0 -y 0 -w 550 -h 16 -fn inconsolata-10 -fg #00ff00 -bg black"
+musicBar = "/bin/echo '^ca(1,ncmpcpp stop)^i(/home/simon/.xmonad/xbm/stop.xbm)^ca() ^ca(1,ncmpcpp toggle)^i(/home/simon/.xmonad/xbm/playpause.xbm)^ca() ^ca(1,ncmpcpp prev)^i(/home/simon/.xmonad/xbm/prev.xbm)^ca() ^ca(1,ncmpcpp next)^i(/home/simon/.xmonad/xbm/next.xbm)^ca()' | dzen2 -p -x 550 -y 0 -w 100 -h 16 -fn inconsolata-10 -fg lightgreen -bg black"
+rightBar = "conky -c ~/.conky/conkyrc | dzen2 -e 'button4=exec:amixer -q set Master 1+;button5=exec:amixer -q set Master 1-;button2=exec:amixer -q sset Master toggle' -x 650 -h 16 -fn inconsolata-10 -y 0 -w 950 -ta r -fg #00ff00 -bg black"
+
+myUrgencyHook = withUrgencyHook dzenUrgencyHook
+	{ args = ["-y 1000"] }
+
+myDzenPP h = defaultPP
+	{ ppCurrent = wrap "^fg(#00ff00)^bg(#333333)^i(/home/simon/.xmonad/xbm/corner.xbm)^fg(#00ff00)" "^bg()^fg()" . \wsId -> dropIx wsId
+	, ppVisible = wrap "^fg(#00ff00)^i(/home/simon/.xmonad/xbm/corner.xbm)^fg(#00ff00)" "^fg()" . \wsId -> dropIx wsId
+	, ppHidden = wrap "^i(/home/simon/.xmonad/xbm/corner.xbm)^fg(#00ff00)" "^fg()" . \wsId -> dropIx wsId
+	, ppHiddenNoWindows = \wsId -> if wsId `notElem` staticWs then "" else wrap "^fg(#444444)^i(/home/simon/.xmonad/xbm/corner.xbm)" "^fg()" . dropIx $ wsId
+	, ppUrgent = wrap "^fg(#ff0000)" "^fg()" . \wsId -> dropIx wsId
+	, ppSep = " "
+	, ppWsSep = " "
+	, ppTitle = dzenColor ("#00ff00") "" . wrap "-[ " " ]-"
+	, ppLayout = dzenColor ("#a0a0a0") "" .
+		(\x -> case x of
+		"Full" -> "^fg(#666666)^i(/home/simon/.xmonad/xbm/layout_full.xbm)"
+		"Tall" -> "^fg(#666666)^i(/home/simon/.xmonad/xbm/layout_tall.xbm)"
+		"Mirror Tall" -> "^fg(#666666)^i(/home/simon/.xmonad/xbm/layout_mirror_tall.xbm)"
+		_ -> x
+		)
+	, ppOutput = hPutStrLn h
+	}
+	where 
+	dropIx wsId = replacews wsId
+		where
+		replacews x 
+			| x=="term"  = "^i(/home/simon/.xmonad/xbm/term.xbm)"
+			| x=="www"   = "^i(/home/simon/.xmonad/xbm/www.xbm)"
+			| x=="docs"  = "^i(/home/simon/.xmonad/xbm/docs.xbm)"
+			| x=="media" = "^i(/home/simon/.xmonad/xbm/media.xbm)"
+			| x=="art"   = "^i(/home/simon/.xmonad/xbm/art.xbm)"
+			| x=="games" = "^i(/home/simon/.xmonad/xbm/games.xbm)"
+			| x=="code"  = "^i(/home/simon/.xmonad/xbm/code.xbm)"
+			| x=="pics"  = "^i(/home/simon/.xmonad/xbm/pics.xbm)"
+			| otherwise  = x
+	staticWs = ["term", "www", "media", "docs", "pics", "games", "art"]
+
+myLayoutHook = Full ||| tall ||| Mirror tall  
+	where
+		tall = Tall 1 (3/100) (2/3)
+
+main = do
+	dzen <- spawnPipe myStatusBar
+	conkyexample <- spawnPipe rightBar
+	musicConky <- spawnPipe musicBar
+	xmonad $ myUrgencyHook $ defaultConfig
+		{ manageHook = myManageHook
+		, layoutHook = avoidStruts $ myLayoutHook 
+		, workspaces = ["term", "www", "media", "docs", "pics", "games", "art"] ++ (map show [8..10])
+		, logHook = dynamicLogWithPP $ myDzenPP dzen 
+		, focusFollowsMouse = True
+		, modMask = mod4Mask
+		, terminal = "urxvt"
+		, normalBorderColor = "#000000"
+		, focusedBorderColor = "#ffffff"
+		, borderWidth = 0
+		}`additionalKeysP`
+        		[ ("M-b", sendMessage ToggleStruts), 
+			  ("<XF86ScreenSaver>", spawn "slock") ]

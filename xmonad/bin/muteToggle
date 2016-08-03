@@ -1,0 +1,7 @@
+amixer set Master toggle
+if amixer -c 0 get Master | grep -q off
+then
+    echo Muted | dzen2 -p 5	    
+else
+    echo Unmuted | dzen2 -p 5	    
+fi
