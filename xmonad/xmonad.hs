@@ -32,7 +32,7 @@ myManageHook = composeAll
     , className =? "Gimp" --> doFloat 
     , className =? "Wpa_gui" --> doFloat
     , className =? "Tilda" --> doFloat
-    , class =? "conky" --> doIgnore
+    , className =? "conky" --> doIgnore
     , className =? "MacSlow Cairo Ura" --> doFloat
     ]
 -- myLogHook               = return ()
@@ -58,7 +58,7 @@ myEventHook e 		= do
 
 
 myKeys = [ ("M-m", spawn "date +'%c' |  dzen2 -p 4")
-         , ("M-s", spawnPipe "conky -c /home/imnos/.conky/Gotham/Gotham |  dzen2 -p 4")
+         , ("M-s", spawn "conky -c /home/imnos/.conky/Gotham/Gotham |  dzen2 -p 4")
          , ("M-e", spawn "urxvt -e ranger")
 	 , ("M-d", date)	
 	 , ("<XF86AudioMute>", spawn "~/.xmonad/bin/muteToggle")
